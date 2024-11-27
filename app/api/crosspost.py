@@ -5,7 +5,7 @@ from flask import request
 from ..utils import validate_content, optimize_content
 from ..tasks import post_content_task
 from ..rate_limiter import RedisRateLimiter
-from ..config import Config
+from ..config import Config, PLATFORM_CONSTRAINTS
 import logging
 from datetime import datetime
 
@@ -24,7 +24,7 @@ rate_limiter = RedisRateLimiter(Config.REDIS_URL, Config.RATE_LIMIT_REQUESTS, Co
 class CrossPost(Resource):
     @ns.expect(post_model)
     def post(self):
-        """Cross-post content between Threads and Twitter"""
+        """Cross-post content between Threads, Twitter, and LinkedIn."""
         try:
             # Rate limiting check
             client_id = request.headers.get('X-API-Key', 'default')

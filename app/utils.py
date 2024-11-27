@@ -8,6 +8,8 @@ from .config import Config
 import anthropic
 from functools import lru_cache
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 logger = logging.getLogger(__name__)
 
@@ -211,8 +213,9 @@ def requests_retry_session(
         connect=retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
+        allowed_methods=frozenset(['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'])
     )
     adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
     session.mount('https://', adapter)
+    session.mount('http://', adapter)
     return session
