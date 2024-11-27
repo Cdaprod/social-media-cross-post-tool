@@ -1,0 +1,45 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crosspost App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Crosspost Content</h1>
+        <form id="crosspost-form">
+            <div class="form-group">
+                <label for="content">Content:</label>
+                <textarea class="form-control" id="content" name="content" rows="5" placeholder="Enter your content here..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Crosspost</button>
+        </form>
+        <div id="response" class="mt-4"></div>
+    </div>
+
+    <script>
+        document.getElementById('crosspost-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const content = e.target.content.value;
+            fetch('/crosspost/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': 'your-api-key'  // Replace with actual API key handling
+                },
+                body: JSON.stringify({ content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Error: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>

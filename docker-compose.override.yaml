@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - THREADS_APP_ID=${THREADS_APP_ID}
+      - THREADS_APP_SECRET=${THREADS_APP_SECRET}
+      - THREADS_ACCESS_TOKEN=${THREADS_ACCESS_TOKEN}
+      - TWITTER_API_KEY=${TWITTER_API_KEY}
+      - TWITTER_API_SECRET=${TWITTER_API_SECRET}
+      - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}
+      - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW}
+      - REDIS_URL=${REDIS_URL}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - SENTRY_DSN=${SENTRY_DSN}
+    depends_on:
+      - redis
+      - celery
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+  celery:
+    build: .
+    command: celery -A app.celery worker --loglevel=info
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      # Add other necessary environment variables
+    depends_on:
+      - redis
