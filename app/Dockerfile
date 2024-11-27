@@ -1,4 +1,4 @@
-# Dockerfile
+# app/Dockerfile
 
 FROM python:3.11-slim
 
@@ -14,12 +14,12 @@ RUN apt-get update && apt-get install -y build-essential libssl-dev libffi-dev p
 WORKDIR /app
 
 # Install Python dependencies
-COPY app/requirements.txt .
+COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # Copy project
-COPY app /app
+COPY . /app
 
 # Expose port
 EXPOSE 5000

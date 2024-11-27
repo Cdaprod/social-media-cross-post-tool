@@ -1,0 +1,31 @@
+# app/docker-compose.crosspost.yaml
+
+version: '3.8'
+
+services:
+  crosspost:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - celery_crosspost
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+
+  celery_crosspost:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A tasks.celery worker --loglevel=info
+    env_file:
+      - .env
+    depends_on:
+      - redis

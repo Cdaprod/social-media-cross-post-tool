@@ -1,4 +1,4 @@
-# app/utils.py (final)
+# app/utils.py
 
 import re
 from typing import Tuple, Optional
@@ -8,7 +8,6 @@ from .config import Config
 import anthropic
 from functools import lru_cache
 import requests
-from .utils import requests_retry_session
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +48,6 @@ Content: {content}
 Content: {content}
 """
     }
-    # Add more platforms as needed
 }
 
 def validate_content(content: str) -> Tuple[bool, Optional[str]]:
@@ -58,9 +56,9 @@ def validate_content(content: str) -> Tuple[bool, Optional[str]]:
         return False, "Content cannot be empty"
     if len(content) > 1000:
         return False, "Content exceeds maximum length of 1000 characters"
-    if not re.match(r'^[\w\s\d.,!?@#$%^&*()-=+;:\'"\[\]{}|\\/]+$', content):
+    if not re.match(r'^[\w\s\d.,!?@#$%^&*()\-+=;:\'"\[\]{}|\\/]+$', content):
         return False, "Content contains invalid characters"
-    
+
     # Language detection
     try:
         language = detect(content)
@@ -68,12 +66,12 @@ def validate_content(content: str) -> Tuple[bool, Optional[str]]:
             return False, f"Unsupported language: {language}"
     except LangDetectException:
         return False, "Unable to detect language"
-    
+
     # Prohibited content
     prohibited_words = ['badword1', 'badword2']  # Example list
     if any(word in content.lower() for word in prohibited_words):
         return False, "Content contains prohibited language"
-    
+
     return True, None
 
 @lru_cache(maxsize=1024)
@@ -82,20 +80,20 @@ def optimize_content(content: str, platform: str) -> str:
     try:
         platform_config = PLATFORM_CONSTRAINTS[platform]
         prompt = platform_config["prompt"].format(content=content)
-        
+
         response = anthropic_client.completions.create(
             model="claude-3.5-sonnet",
             max_tokens_to_sample=150,
             prompt=prompt,
             temperature=0.7
         )
-        
+
         optimized_content = response.completion.strip()
-        
+
         # Ensure content meets platform constraints
         if len(optimized_content) > platform_config["max_length"]:
             optimized_content = optimized_content[:platform_config["max_length"]]
-        
+
         return optimized_content
 
     except Exception as e:
@@ -204,7 +202,7 @@ def requests_retry_session(
 ):
     """Creates a requests session with retry strategy."""
     from requests.adapters import HTTPAdapter
-    from requests.packages.urllib3.util.retry import Retry
+    from urllib3.util.retry import Retry
 
     session = session or requests.Session()
     retry = Retry(
